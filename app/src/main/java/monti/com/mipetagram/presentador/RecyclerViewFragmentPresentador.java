@@ -7,11 +7,17 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import monti.com.mipetagram.bd.ConstructorMascotas;
 import monti.com.mipetagram.pojo.Mascota;
+import monti.com.mipetagram.pojo.Usuario;
+import monti.com.mipetagram.resApi.ConstantesResApi;
 import monti.com.mipetagram.resApi.EndpointApi;
 import monti.com.mipetagram.resApi.adapter.RestApiAdapter;
+import monti.com.mipetagram.resApi.model.FotoResponse;
 import monti.com.mipetagram.resApi.model.MascotaResponse;
 import monti.com.mipetagram.vistas.IRecyclerViewFragmentView;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -27,10 +33,21 @@ public class RecyclerViewFragmentPresentador implements IRecyclerViewFragmentPre
     private Context context;
     private ConstructorMascotas constructor;
     private ArrayList<Mascota> mascotas;
+    private String cuenta = "susana.chvz";
+    private Usuario usuario;
+    RestApiAdapter restApiAdapter;
+    Gson gsonConsulta;
+    EndpointApi endpointApi;
 
     public RecyclerViewFragmentPresentador(IRecyclerViewFragmentView view, Context context) {
         this.iRecyclerViewFragmentView = view;
         this.context = context;
+
+        if (cargarUsuario() != "")
+        {
+            cuenta = cargarUsuario();
+        }
+
       //  obtenerMascotasBD();
         obtenerMedioRecientes();
     }
@@ -41,16 +58,75 @@ public class RecyclerViewFragmentPresentador implements IRecyclerViewFragmentPre
   //     mascotas = constructor.obtenerDatos();
         mostrarMascotasRV();
     }
+    @Override
+    public String cargarUsuario() {
+
+        String usuario = "";
+
+        try{
+            //FileInputStream fis =  openFileInput("usuario.txt");
+
+            FileInputStream fis = context.openFileInput("usuario.txt");
+            InputStreamReader isr = new InputStreamReader(fis);
+
+            char[] inputBuffer = new char[100];
+
+            int charRead;
+            while((charRead = isr.read(inputBuffer)) > 0){
+                // Convertimos los char a String
+                String readString = String.copyValueOf(inputBuffer, 0, charRead);
+                usuario += readString;
+
+                inputBuffer = new char[100];
+            }
+
+            // Establecemos en el EditText el texto que hemos leido
+            ///textBox.setText(s);
+
+            isr.close();
+        }catch (IOException ex){
+            usuario= "";
+            ex.printStackTrace();
+        }
+
+        return usuario;
+    }
 
 
     @Override
     public void obtenerMedioRecientes() {
-        RestApiAdapter restApiAdapter = new RestApiAdapter(); //Realiz una conexion con Instagrm
-        Gson gsonMediaRecent  = restApiAdapter.construyeGsonDeserializadorMediaRecent();
-        EndpointApi endpointApi = restApiAdapter.establecerConexionRestApiInstagram(gsonMediaRecent);
-    //    Call<MascotaResponse> mascotaResponseCall = endpointApi.getRecentMedia();
+        restApiAdapter = new RestApiAdapter(); //Realiz una conexion con Instagrm
+        gsonConsulta = restApiAdapter.construyeGsonDeserializadorFotoUsuario();
+        endpointApi = restApiAdapter.establecerConexionRestApiInstagram(gsonConsulta);
 
-        Call<MascotaResponse> mascotaResponseCall = endpointApi.getRecentMediaAmigos();
+        Call<FotoResponse> fotoResponseCall = endpointApi.getFotoUsuario(cuenta, ConstantesResApi.ACCESS_TOKEN);
+
+        //Para controlar el resultado de la respuesta
+        fotoResponseCall.enqueue(new Callback<FotoResponse>() {
+            @Override
+            public void onResponse(Call<FotoResponse> call, Response<FotoResponse> response) {
+                FotoResponse fotoResponse = response.body();
+                if (fotoResponse == null) {
+                    Toast.makeText(context, ".....ES NULL", Toast.LENGTH_SHORT).show();
+                } else {
+                    usuario = fotoResponse.getUsuario();
+                    buscarMediosRecientes(usuario);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FotoResponse> call, Throwable t) {
+                Toast.makeText(context, "Algo paso :(", Toast.LENGTH_SHORT).show();
+                Log.e("FALLO LA CONEXION", t.toString());
+            }
+        });
+    }
+
+    public void buscarMediosRecientes(Usuario usuario){
+        gsonConsulta = restApiAdapter.construyeGsonDeserializadorMediaRecent();
+        endpointApi = restApiAdapter.establecerConexionRestApiInstagram(gsonConsulta);
+
+        Call<MascotaResponse> mascotaResponseCall = endpointApi.getRecentMediaAmigos(usuario.getId());
 
         //Para controlar el resultado de la respuesta
         mascotaResponseCall.enqueue(new Callback<MascotaResponse>() {
@@ -65,8 +141,6 @@ public class RecyclerViewFragmentPresentador implements IRecyclerViewFragmentPre
             public void onFailure(Call<MascotaResponse> call, Throwable t) {
                 Toast.makeText(context, "Algo paso :(", Toast.LENGTH_SHORT).show();
                 Log.e("FALLO LA CONEXION", t.toString());
-//                Log.e("FALLO LA CONEXION", t.getLocalizedMessage());
-//                Log.e("FALLO LA CONEXION", t.getCause().toString());
             }
         });
     }

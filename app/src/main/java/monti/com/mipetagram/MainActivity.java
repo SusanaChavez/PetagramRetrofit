@@ -42,42 +42,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //       getSupportFragmentManager().beginTransaction().add(R.id.)
-
-//***********
-//        Toolbar miActionBar = (Toolbar) findViewById(R.id.miActionBar);
-//        setSupportActionBar(miActionBar);
-
-//        ActionBar actionBar = getSupportActionBar();
-        //  actionBar.setDisplayUseLogoEnabled(true);
-
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-//        actionBar.setTitle("");
-//        actionBar.setDisplayShowTitleEnabled(false);
-//        actionBar.setDisplayShowTitleEnabled(true);
-//        actionBar.setLogo(R.drawable.huellaback);
-        // actionBar.setHomeAsUpIndicator(R.drawable.back);
-
-
-        //Add the following code to make the up arrow white:
-        //final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        //upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
-        //getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-        //Estoy probando
-        // actionBar.setIcon(android.R.color.transparent);
-        // actionBar.setDisplayUseLogoEnabled(false);
-
-        /* para cambiar la barra
-           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
-
-
-        ActionBar actionBar = getSupportActionBar(); // or getActionBar();
-getSupportActionBar().setTitle("My new title"); // set the top title
-String title = actionBar.getTitle().toString(); // get the title
-actionBar.hide();
-         */
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -99,20 +63,14 @@ actionBar.hide();
         viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(), agregarFragments()));
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.house);
-        tabLayout.getTabAt(0).setTag("uno");
         tabLayout.getTabAt(1).setIcon(R.drawable.face);
-        tabLayout.getTabAt(0).setTag("dos");
     }
 
     private ArrayList<Fragment> agregarFragments() {
         ArrayList<Fragment> fragments = new ArrayList<>();
         fragments.add(new RecyclerViewFragment());
 
-        Bundle bundle = new Bundle();
-        PerfilFragment perfilFragment = new PerfilFragment();
-        bundle.putString("cuenta", cuenta);
-        perfilFragment.setArguments(bundle);
-        fragments.add(perfilFragment);
+        fragments.add(new PerfilFragment());
 
         return fragments;
     }
@@ -155,7 +113,8 @@ actionBar.hide();
                 break;
             case R.id.mpConfigurar:
                 intent = new Intent(this, ConfigurarCuenta.class);
-                startActivityForResult(intent, 0);
+  //             startActivityForResult(intent, 0);
+                startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -164,38 +123,6 @@ actionBar.hide();
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 0) switch (resultCode) {
-            case RESULT_OK:
-                cuenta = data.getExtras().getString("cuenta");
-                Bundle bundle = new Bundle();
-                bundle.putString("cuenta", cuenta);
-                PerfilFragment perfilFragment = new PerfilFragment();
-                perfilFragment.setArguments(bundle);
-
-                // Reload current fragment
-                //http://stackoverflow.com/questions/34310592/how-open-fragment-from-recyclerview-adaptercardadapter-viewholder
-                //http://www.programcreek.com/java-api-examples/index.php?api=android.support.v4.app.FragmentStatePagerAdapter
-/*
-                    perfilFragment = (PerfilFragment) this.getSupportFragmentManager().findFragmentById(this.getTaskId());
-                    //Fragment fg = (PerfilFragment) this.getSupportFragmentManager().findFragmentById(this.getTaskId());
-                    final FragmentTransaction ft = this.getSupportFragmentManager().beginTransaction();
-                    ft.detach(perfilFragment);
-                    ft.attach(perfilFragment);
-                    ft.commit();
-                    */
-
-                //viewPager.getAdapter().setPrimaryItem(this, 1, perfilFragment);
-
-                break;
-            case RESULT_CANCELED:
-                //Toast.makeText(this, "Rechazó las condiciones", Toast.LENGTH_SHORT).show();
-                break;
-        }
     }
 
     /**
@@ -217,7 +144,6 @@ actionBar.hide();
     @Override
     public void onStart() {
         super.onStart();
-
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
@@ -227,7 +153,6 @@ actionBar.hide();
     @Override
     public void onStop() {
         super.onStop();
-
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());

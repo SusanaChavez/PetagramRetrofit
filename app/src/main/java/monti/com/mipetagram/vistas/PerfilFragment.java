@@ -52,7 +52,7 @@ public class PerfilFragment extends Fragment implements IPerfilFragment {
 
         //     Toast.makeText(Favoritas.this, "He creado todas las mascotas ", Toast.LENGTH_SHORT).show();
         //  Snackbar.make(nose, "Estooooy pasando........", Snackbar.LENGTH_SHORT);
-        perfilFragmentPresentador = new PerfilFragmentPresentador(this, getContext(), bundle);
+        perfilFragmentPresentador = new PerfilFragmentPresentador(this, getContext());
         return v;
     }
 
@@ -64,7 +64,6 @@ public class PerfilFragment extends Fragment implements IPerfilFragment {
     public void generarLinearLayoutVertical() {
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
-
     }
 
     @Override

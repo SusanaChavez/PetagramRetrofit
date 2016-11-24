@@ -5,6 +5,7 @@ import monti.com.mipetagram.resApi.model.MascotaResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -17,7 +18,7 @@ public interface EndpointApi {
     Call<MascotaResponse> getRecentMedia();
 
     @GET(ConstantesResApi.URL_GET_RECENT_MEDIA_AMIGOS)
-    Call<MascotaResponse> getRecentMediaAmigos();
+    Call<MascotaResponse> getRecentMediaAmigos(@Path("usuario") String usuario);
 
 //https://api.instagram.com/v1/users/search?q=miaucat123&access_token=3221225214.419fad8.dd48302ce4ef4756aec2943a9162562e
     @GET(ConstantesResApi.KEY_SEARCH_USER)

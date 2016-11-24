@@ -10,4 +10,6 @@ public interface IPerfilFragmentPresentador {
     public void obtenerFotoUsuario();
 
     public void mostrarFotosRV();
+
+    public String cargarUsuario();
 }

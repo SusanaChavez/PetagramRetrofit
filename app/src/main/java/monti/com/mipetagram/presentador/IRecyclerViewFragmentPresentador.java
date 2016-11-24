@@ -8,6 +8,8 @@ public interface IRecyclerViewFragmentPresentador {
 
     public void obtenerMascotasBD();
 
+    public String cargarUsuario();
+
     public void obtenerMedioRecientes();
 
     public void mostrarMascotasRV();

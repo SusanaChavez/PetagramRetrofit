@@ -14,6 +14,9 @@ import monti.com.mipetagram.resApi.adapter.RestApiAdapter;
 import monti.com.mipetagram.resApi.model.FotoResponse;
 import monti.com.mipetagram.vistas.IPerfilFragment;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -27,16 +30,18 @@ import retrofit2.Response;
 public class PerfilFragmentPresentador  implements IPerfilFragmentPresentador {
     private IPerfilFragment iPerfilFragment;
     private Context context;
-    private ConstructorMascotas constructor;
     private Usuario usuario;
+    private ConstructorMascotas constructor;
     private String cuenta = "susana.chvz";
     private ArrayList<Usuario> misUsuarios = new ArrayList<>();
-    Bundle bundle;
 
-    public PerfilFragmentPresentador(IPerfilFragment view, Context context, Bundle bundle) {
+    public PerfilFragmentPresentador(IPerfilFragment view, Context context) {
         this.iPerfilFragment = view;
         this.context = context;
-        this.bundle = bundle;
+        if (cargarUsuario() != "")
+        {
+            cuenta = cargarUsuario();
+        }
         obtenerFotoUsuario();
     }
 
@@ -50,12 +55,6 @@ public class PerfilFragmentPresentador  implements IPerfilFragmentPresentador {
         RestApiAdapter restApiAdapter = new RestApiAdapter(); //Realiz una conexion con Instagrm
         Gson gsonFotoUsuario  = restApiAdapter.construyeGsonDeserializadorFotoUsuario();
         EndpointApi endpointApi = restApiAdapter.establecerConexionRestApiInstagram(gsonFotoUsuario);
-        if(bundle.get("cuenta").equals("")){
-
-        }else{
-            cuenta = bundle.get("cuenta").toString();
-        }
-     //   Toast.makeText(context, cuenta, Toast.LENGTH_SHORT).show();
 
         Call<FotoResponse> fotoResponseCall = endpointApi.getFotoUsuario(cuenta, ConstantesResApi.ACCESS_TOKEN);
 
@@ -90,8 +89,44 @@ public class PerfilFragmentPresentador  implements IPerfilFragmentPresentador {
         iPerfilFragment.completarPerfil(usuario);
     }
 
-    public Usuario getUsuario(){
+    @Override
+    public String cargarUsuario() {
+
+        String usuario = "";
+
+        try{
+            //FileInputStream fis =  openFileInput("usuario.txt");
+
+            FileInputStream fis = context.openFileInput("usuario.txt");
+            InputStreamReader isr = new InputStreamReader(fis);
+
+            char[] inputBuffer = new char[100];
+
+            int charRead;
+            while((charRead = isr.read(inputBuffer)) > 0){
+                // Convertimos los char a String
+                String readString = String.copyValueOf(inputBuffer, 0, charRead);
+                usuario += readString;
+
+                inputBuffer = new char[100];
+            }
+
+            // Establecemos en el EditText el texto que hemos leido
+            ///textBox.setText(s);
+
+            isr.close();
+        }catch (IOException ex){
+            usuario= "";
+            ex.printStackTrace();
+        }
+
         return usuario;
     }
+
+ /*   public Usuario getUsuario(){
+        return usuario;
+    }
+   */
+
 
 }
