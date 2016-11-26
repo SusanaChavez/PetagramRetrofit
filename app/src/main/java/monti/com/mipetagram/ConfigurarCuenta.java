@@ -20,6 +20,7 @@ public class ConfigurarCuenta extends AppCompatActivity {
     private EditText tvCuenta;
     private Toolbar toolbar;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
